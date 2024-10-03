@@ -75,10 +75,13 @@ class MarkdownToLatexRenderer(mistune.HTMLRenderer):
         return f'\\marginpar{{{text}}}'
 
 
-def markdown_to_latex(md_text):
+def markdown_to_latex(md_text, standalone=False):
     renderer = MarkdownToLatexRenderer()
     markdown = mistune.create_markdown(renderer=renderer, plugins=[SidenotePlugin])
-    return latex_header + markdown(md_text) + latex_footer
+    inner_text = markdown(md_text)
+    if not standalone:
+        return inner_text
+    return latex_header + inner_text + latex_footer
 
 
 ### Header and Footer for my own use ###
