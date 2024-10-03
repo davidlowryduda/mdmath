@@ -89,8 +89,80 @@ class MarkdownToHTMLRenderer(mistune.HTMLRenderer):
         return marker + sidenote_content
 
 
-def markdown_to_html_with_sidenotes(md_text):
+def markdown_to_html_with_sidenotes(md_text, standalone=False):
+    """
+    `standalone` means the output should be a rendering of a complete HTML
+    page.
+    """
     renderer = MarkdownToHTMLRenderer()
     markdown = mistune.create_markdown(renderer=renderer, plugins=[SidenotePlugin])
     html_content = markdown(md_text)
-    return html_content
+    if not standalone:
+        return html_content
+    formatter = HtmlFormatter(style="borland")
+    pygments_css = formatter.get_style_defs(".codehilite")
+    html_page = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Markdown Document</title>
+        <style>
+        {pygments_css}
+        {BASE_CSS}
+        </style>
+    </head>
+    <body>
+        {html_content}
+    </body>
+    </html>
+    """
+    return html_page
+
+
+BASE_CSS = """
+    body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 20px;
+        padding: 0;
+        background-color: #f4f4f9;
+        color: #333;
+    }
+    h1, h2, h3 {
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 0.3em;
+    }
+    aside {
+        float: right;
+        width: 200px;
+        margin-left: 1rem;
+        padding: 0.5rem;
+        border-left: 2px solid #ccc;
+        font-size: 0.9rem;
+        background-color: #f9f9f9;
+        color: #333;
+        position: relative;
+    }
+    p {
+        clear: both;
+    }
+    sup {
+        font-size: 0.8rem;
+    }
+    pre {
+        background: #f0f0f0;
+        padding: 1rem;
+        border-radius: 5px;
+        overflow-x: auto;
+    }
+    code {
+        background: #f0f0f0;
+        padding: 2px 5px;
+        border-radius: 3px;
+    }
+    .codehilite {
+        margin-bottom: 1rem;
+    }
+"""
