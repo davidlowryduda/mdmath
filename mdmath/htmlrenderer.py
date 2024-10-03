@@ -22,6 +22,12 @@ htmlrenderer.py - md-->html
 # **********************************************************************
 """
 import mistune
+import pygments
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name, guess_lexer
+from pygments.formatters import HtmlFormatter
+from pygments.util import ClassNotFound
+
 
 from dbmath.sidenote import SidenotePlugin
 
@@ -65,8 +71,16 @@ class MarkdownToHTMLRenderer(mistune.HTMLRenderer):
         return f'<code>{text}</code>'
 
     def block_code(self, code, info=None):
-        # TODO pygmentize code
-        return f'<pre><code>{code}</code></pre>\n\n'
+        """Render code block with Pygments highlighting."""
+        if not lang: lexer = guess_lexer(code)
+        else:
+            try:
+                lexer = get_lexer_by_name(lang)
+            except ClassNotFound:
+                lexer = guess_lexer(code)
+        formatter = HtmlFormatter()
+        highlighted_code = highlight(code, lexer, formatter)
+        return f'<div class="codehilite">{highlighted_code}</div>\n\n'
 
     def sidenote(self, text):
         marker = f'<sup>{self.sidenote_counter}</sup>'
