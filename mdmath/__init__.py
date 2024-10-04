@@ -19,4 +19,11 @@
 #                 <http://www.gnu.org/licenses/>.
 # **********************************************************************
 """
+from mdmath.htmlrenderer import markdown_to_html
+from mdmath.latexrenderer import markdown_to_latex
+
+
 VERSION = "0.0.1"
+
+
+__all__ = [markdown_to_html, markdown_to_latex]

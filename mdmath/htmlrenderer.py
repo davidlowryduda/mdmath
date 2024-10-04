@@ -29,7 +29,7 @@ from pygments.formatters import HtmlFormatter
 from pygments.util import ClassNotFound
 
 
-from dbmath.sidenote import SidenotePlugin
+from mdmath.sidenote import SidenotePlugin
 
 
 class MarkdownToHTMLRenderer(mistune.HTMLRenderer):
@@ -72,10 +72,10 @@ class MarkdownToHTMLRenderer(mistune.HTMLRenderer):
 
     def block_code(self, code, info=None):
         """Render code block with Pygments highlighting."""
-        if not lang: lexer = guess_lexer(code)
+        if not info: lexer = guess_lexer(code)
         else:
             try:
-                lexer = get_lexer_by_name(lang)
+                lexer = get_lexer_by_name(info)
             except ClassNotFound:
                 lexer = guess_lexer(code)
         formatter = HtmlFormatter()
@@ -89,7 +89,7 @@ class MarkdownToHTMLRenderer(mistune.HTMLRenderer):
         return marker + sidenote_content
 
 
-def markdown_to_html_with_sidenotes(md_text, standalone=False):
+def markdown_to_html(md_text, standalone=False):
     """
     `standalone` means the output should be a rendering of a complete HTML
     page.
@@ -102,67 +102,67 @@ def markdown_to_html_with_sidenotes(md_text, standalone=False):
     formatter = HtmlFormatter(style="borland")
     pygments_css = formatter.get_style_defs(".codehilite")
     html_page = f"""
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Markdown Document</title>
-        <style>
-        {pygments_css}
-        {BASE_CSS}
-        </style>
-    </head>
-    <body>
-        {html_content}
-    </body>
-    </html>
-    """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Document</title>
+    <style>
+    {pygments_css}
+    {BASE_CSS}
+    </style>
+</head>
+<body>
+    {html_content}
+</body>
+</html>
+"""
     return html_page
 
 
 BASE_CSS = """
-    body {
-        font-family: Arial, sans-serif;
-        line-height: 1.6;
-        margin: 20px;
-        padding: 0;
-        background-color: #f4f4f9;
-        color: #333;
-    }
-    h1, h2, h3 {
-        border-bottom: 2px solid #ddd;
-        padding-bottom: 0.3em;
-    }
-    aside {
-        float: right;
-        width: 200px;
-        margin-left: 1rem;
-        padding: 0.5rem;
-        border-left: 2px solid #ccc;
-        font-size: 0.9rem;
-        background-color: #f9f9f9;
-        color: #333;
-        position: relative;
-    }
-    p {
-        clear: both;
-    }
-    sup {
-        font-size: 0.8rem;
-    }
-    pre {
-        background: #f0f0f0;
-        padding: 1rem;
-        border-radius: 5px;
-        overflow-x: auto;
-    }
-    code {
-        background: #f0f0f0;
-        padding: 2px 5px;
-        border-radius: 3px;
-    }
-    .codehilite {
-        margin-bottom: 1rem;
-    }
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 20px;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}
+h1, h2, h3 {
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 0.3em;
+}
+aside {
+    float: right;
+    width: 200px;
+    margin-left: 1rem;
+    padding: 0.5rem;
+    border-left: 2px solid #ccc;
+    font-size: 0.9rem;
+    background-color: #f9f9f9;
+    color: #333;
+    position: relative;
+}
+p {
+    clear: both;
+}
+sup {
+    font-size: 0.8rem;
+}
+pre {
+    background: #f0f0f0;
+    padding: 1rem;
+    border-radius: 5px;
+    overflow-x: auto;
+}
+code {
+    background: #f0f0f0;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+.codehilite {
+    margin-bottom: 1rem;
+}
 """

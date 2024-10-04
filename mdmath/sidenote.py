@@ -23,7 +23,6 @@ sidenote.py - a sidenote plugin for mistune
 """
 class SidenotePlugin:
     def __init__(self, *args):
-        print(args)
         self.pattern = r'\[note\](.*?)\[\/note\]'
 
     def parse(self, match, state):
