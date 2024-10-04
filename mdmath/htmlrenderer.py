@@ -35,8 +35,6 @@ from mdmath.sidenote import SidenotePlugin
 class MarkdownToHTMLRenderer(mistune.HTMLRenderer):
     def __init__(self):
         super().__init__()
-        self.sidenote_counter = 1
-        self.sidenotes = []
 
     def heading(self, text, level):
         return f'<h{level}>{text}</h{level}>\n'
@@ -82,11 +80,14 @@ class MarkdownToHTMLRenderer(mistune.HTMLRenderer):
         highlighted_code = highlight(code, lexer, formatter)
         return f'<div class="codehilite">{highlighted_code}</div>\n\n'
 
-    def sidenote(self, text):
-        marker = f'<sup>{self.sidenote_counter}</sup>'
-        sidenote_content = f'<aside id="sidenote-{self.sidenote_counter}"><sup>{self.sidenote_counter}</sup> {text}</aside>'
-        self.sidenote_counter += 1
-        return marker + sidenote_content
+
+sidenote_counter = 1
+def render_sidenote(renderer, text):
+    global sidenote_counter
+    marker = f'<sup>{sidenote_counter}</sup>'
+    sidenote_content = f'<aside id="sidenote-{sidenote_counter}"><sup>{sidenote_counter}</sup> {text}</aside>'
+    sidenote_counter += 1
+    return marker + sidenote_content
 
 
 def markdown_to_html(md_text, standalone=False):
@@ -95,6 +96,7 @@ def markdown_to_html(md_text, standalone=False):
     page.
     """
     renderer = MarkdownToHTMLRenderer()
+    renderer.register('sidenote', render_sidenote)
     markdown = mistune.create_markdown(renderer=renderer, plugins=[SidenotePlugin])
     html_content = markdown(md_text)
     if not standalone:

@@ -21,13 +21,17 @@ sidenote.py - a sidenote plugin for mistune
 #                 <http://www.gnu.org/licenses/>.
 # **********************************************************************
 """
-class SidenotePlugin:
-    def __init__(self, *args):
-        self.pattern = r'\[note\](.*?)\[\/note\]'
+SIDENOTE_PATTERN = r'\[note\](?P<sidenote_text>.*?)\[\/note\]'
 
-    def parse(self, match, state):
-        text = match.group(1)
-        return {'type': 'sidenote', 'text': text}
 
-    def render(self, renderer, data):
-        return renderer.sidenote(data['text'])
+def parse_sidenote(inline, m, state):
+    text = m.group('sidenote_text')
+    new_state = state.copy()
+    new_state.src = text
+    children = inline.render(new_state)
+    state.append_token({'type': 'sidenote', 'children': children})
+    return m.end()
+
+
+def SidenotePlugin(md):
+    md.inline.register('sidenote', SIDENOTE_PATTERN, parse_sidenote, before='link')
