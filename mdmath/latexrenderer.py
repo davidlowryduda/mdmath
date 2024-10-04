@@ -71,12 +71,14 @@ class MarkdownToLatexRenderer(mistune.HTMLRenderer):
             info = 'txt'
         return f'\\begin{{minted}}[breaklines, linenos, breaksymbol={{\\tiny\\color{{black}}\\ensuremath{{\\hookrightarrow}}}}]{{{info}}}\n{code}\\end{{minted}}\n'
 
-    def sidenote(self, text):
-        return f'\\marginpar{{{text}}}'
+
+def render_sidenote(renderer, text):
+    return fr'\marginpar{{{{\small}}{text}}}'
 
 
 def markdown_to_latex(md_text, standalone=False):
     renderer = MarkdownToLatexRenderer()
+    renderer.register('sidenote', render_sidenote)
     markdown = mistune.create_markdown(renderer=renderer, plugins=[SidenotePlugin])
     inner_text = markdown(md_text)
     if not standalone:
